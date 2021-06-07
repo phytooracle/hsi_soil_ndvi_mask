@@ -113,85 +113,10 @@ def get_mean_reflectance(masked_array):
 
 
 # --------------------------------------------------
-def plot_spectra(f, mean_refl_list):
-    
-    wavelength_floats = f.attrs['wavelength'].astype(float)
-
-    sns.set_style("whitegrid")
-    sns.set_context("paper")
-
-    sns.relplot(x=wavelength_floats,
-                y=mean_refl_list[0], 
-                height=5,
-                aspect=1.5)
-
-    plt.xlabel('Wavelength (nm)')
-    plt.ylabel('Digital number (DN)')
-    plt.xticks(rotation=45);
-
-
-# --------------------------------------------------
 def write_mask_to_h5(f, soil_mask, ndvi_mask):
     
     f.create_dataset('soil_mask', data=soil_mask)
     f.create_dataset('ndvi_mask', data=ndvi_mask)
-    f.close()
-
-
-# --------------------------------------------------
-def generate_soil_mask(f, x_lim, band = 700):
-    
-    original = f['hyperspectral'][:, x_lim[0]:x_lim[1],band]
-    mask = f['hyperspectral'][:, x_lim[0]:x_lim[1], band]
-
-    mask[mask<=3000]=0
-    mask[mask>0]=255
-
-    masked_array = f['hyperspectral'][:, x_lim[0]:x_lim[1],:]
-    masked_array[np.where(mask==0)] = 0
-
-    return mask, masked_array
-
-
-# --------------------------------------------------
-def generate_ndvi_mask(f, x_lim):
-    
-    wavelength_floats = f.attrs['wavelength'].astype(float)
-    b1 = closest(wavelength_floats, 607.0)[0]
-    b2 = closest(wavelength_floats, 802.5)[0]
-
-    mask = ndvi(f['hyperspectral'][:, x_lim[0]:x_lim[1],:], b1, b2)
-    mask[mask<0.4]=0
-    mask[mask>=0.4]=255
-
-    masked_array = f['hyperspectral'][:, x_lim[0]:x_lim[1],:]
-    masked_array[np.where(mask==0)] = 0
-
-    return mask, masked_array
-
-
-# --------------------------------------------------
-def get_mean_reflectance(masked_array):
-
-    mean_refl_list = []
-    mean_refl = np.zeros(masked_array.shape[2])
-
-    for i in np.arange(masked_array.shape[2]):
-        refl_band = masked_array[:,:,i]
-        mean_refl[i] = np.ma.mean(refl_band[refl_band!=0])
-
-    mean_refl_list.append(mean_refl)
-    
-    return mean_refl_list
-
-
-# --------------------------------------------------
-def write_mask_to_h5(f, soil_mask, ndvi_mask, soil_mean_refl, ndvi_mean_refl):
-    
-    f.create_dataset('soil_mask', data=soil_mask)
-    f.create_dataset('ndvi_mask', data=ndvi_mask)
-    f.create_dataset('soil_mean_spectra', data=soil_mean_refl)
-    f.create_dataset('ndvi_mean_spectra', data=ndvi_mean_refl)
     f.close()
 
 
@@ -207,7 +132,7 @@ def main():
     # Determine x bounds.
     if args.max_x is None:
 
-        n_row, n_col, n_bands = f['hyperspectral'].shape
+        n_row, n_col, n_bands = f['hyperspectral'][:,:,:].shape
         x_lim = (args.min_x, n_col)
 
     else: 
