@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Author : eg
+Author : Emmanuel Gonzalez
 Date   : 2021-06-07
-Purpose: Rock the Casbah
+Purpose: Hyperspectral soil and NDVI masking
 """
 
 import argparse
@@ -28,7 +28,7 @@ def get_args():
     """Get command-line arguments"""
 
     parser = argparse.ArgumentParser(
-        description='Rock the Casbah',
+        description='PhytoOracle hyperspectral masking',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('h5_file',
@@ -51,11 +51,10 @@ def get_args():
 
     parser.add_argument('-max',
                         '--max_x',
-                        help='Maximum x value for cropping.',
+                        help='Maximum x value for cropping. Defaults to the entire hyperspectral cube.',
                         metavar='max_x',
                         type=int,
-                        required=False)
-                        # default=700)   
+                        required=False)  
 
     return parser.parse_args()
 
@@ -215,7 +214,7 @@ def main():
         x_lim = (args.min_x, args.max_x)
 
     # Selected band soil masking.
-    soil_mask, soil_masked_array = generate_soil_mask(f, x_lim)
+    soil_mask, soil_masked_array = generate_soil_mask(f, x_lim, band=args.band)
     soil_mean_refl = get_mean_reflectance(soil_masked_array)
 
     # NDVI soil masking.
