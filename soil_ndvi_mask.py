@@ -224,6 +224,7 @@ def main():
     # Append masks to H5 file.
     write_mask_to_h5(f, soil_mask, ndvi_mask, soil_mean_refl, ndvi_mean_refl)
 
+    print(f'Done processing {args.h5_file}')
 
 # --------------------------------------------------
 if __name__ == '__main__':
