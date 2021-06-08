@@ -129,7 +129,7 @@ def main():
     args = get_args()
 
     # Open hyperspectral H5 file. 
-    f = h5py.File(args.h5_file, 'a')
+    f = h5py.File(args.h5_file, 'r+')
 
     # Determine x bounds.
     if args.max_x is None:
