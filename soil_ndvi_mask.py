@@ -113,10 +113,12 @@ def get_mean_reflectance(masked_array):
 
 
 # --------------------------------------------------
-def write_mask_to_h5(f, soil_mask, ndvi_mask):
+def write_mask_to_h5(f, soil_mask, soil_mean_refl, ndvi_mask, ndvi_mean_refl):
     
     f.create_dataset('soil_mask', data=soil_mask)
+    f.create_dataset('soil_mean_spectra', data=soil_mean_refl)
     f.create_dataset('ndvi_mask', data=ndvi_mask)
+    f.create_dataset('ndvi_mean_spectra', data=ndvi_mean_refl)
     f.close()
 
 
@@ -147,7 +149,7 @@ def main():
     ndvi_mean_refl = get_mean_reflectance(ndvi_masked_array)
 
     # Append masks to H5 file.
-    write_mask_to_h5(f, soil_mask, ndvi_mask, soil_mean_refl, ndvi_mean_refl)
+    write_mask_to_h5(f, soil_mask, soil_mean_refl, ndvi_mask, ndvi_mean_refl)
 
     print(f'Done processing {args.h5_file}')
 
